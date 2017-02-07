@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>React - Component</title>
+    <script src="../../js/react.min.js"></script>
+    <script src="../../js/react-dom.min.js"></script>
+    <script src="../../js/browser.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../css/main.css">
+</head>
+<body>
+
+    <div id="container"></div>
+
+     <div id="container02"></div>
+
+    <script type="text/babel">
+
+        var Compo = React.createClass({
+            render: function() {
+                return (<h1>Brahmaji first react component</h1>);
+            }
+        });
+
+
+        var Movie = React.createClass({
+            render: function(){
+                return (
+                    <div>
+                    <h1>Movie Name:{this.props.title}</h1>
+                    <h1>Genre:{this.props.genre}</h1>
+                    </div>);
+            }
+
+        });
+
+        
+        var Comment = React.createClass({
+
+            getInitialState: function(){
+                return {editing:false}
+            },
+
+            editComment : function(){
+               this.setState({editing:true});
+            },
+
+            saveComment: function(){
+                this.props.updateFromBoard(this.refs.newText.value,this.props.index);
+                this.setState({editing:false});
+            },
+
+            removeComment: function(){
+                console.log('Remove comment');
+                this.props.deleteFromBoard(this.props.index);
+            },
+
+            render: function(){
+                if(this.state.editing){
+                    return this.renderForm();
+                }else{
+                    return this.renderNormal();
+                }
+                
+            },
+
+            renderNormal: function(){
+                return (<div className='commentContainer'>
+                        <div className='commentText'>{this.props.children}</div>
+                        <button onClick={this.editComment}>Edit</ button>
+                        <button onClick={this.removeComment}>Remove</ button>
+                    </div>);
+            },
+
+            renderForm: function(){
+
+                return(<div className='commentContainer'>
+                        <textarea defaultValue={this.props.children} ref='newText' />
+                        <button onClick={this.saveComment}>Save</ button>
+                    </div>);
+            }
+        });
+
+        var Board = React.createClass({
+
+            getInitialState:function(){
+                return{
+                    comments:[]
+                }
+            },
+
+            removeComment: function(i){
+                console.log('removing comment'+i);
+                var arr = this.state.comments;
+                arr.splice(i,1);
+                this.setState({comments:arr});
+
+            },
+
+            updateComment: function(newText,i){
+                console.log('updating the comment');
+                var arr = this.state.comments;
+                arr[i] = newText;
+                this.setState({comments:arr});
+            },
+            
+            eachComment: function(text,i){
+                return(<Comment key={i} index={i} deleteFromBoard={this.removeComment} updateFromBoard={this.updateComment}>{text}</Comment>);
+            },
+            addComment: function(text){
+                var arr = this.state.comments;
+                arr.push(text);
+                this.setState({comments:arr});
+            },
+
+            render: function(){
+                return(
+                <div>
+                <button onClick={this.addComment.bind(null,'New Comment')}>Add Comment</button>
+                <div>
+                {
+                    this.state.comments.map(this.eachComment)
+                }
+                </div></div>)
+            }
+        });
+
+       /*ReactDOM.render(<div><Comment> Sample Comment </ Comment><Comment> New Comment </ Comment></div>, document.getElementById('container'));*/
+       ReactDOM.render(<Board></Board>, document.getElementById('container'));
+       ReactDOM.render(<div><Movie title="Avatar" genre="Action" /> <Movie title="Harry Potter" genre="Magical" /></div>, document.getElementById('container02'));
+    </script>
+
+</body>
+</html>
